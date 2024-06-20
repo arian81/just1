@@ -1,5 +1,7 @@
 import Head from "next/head";
 
+import React from "react";
+
 export default function Home() {
   return (
     <>
@@ -39,7 +41,15 @@ export default function Home() {
         {/* Content */}
         <div className="relative z-10 flex h-full flex-col justify-between p-6">
           {/* Header */}
-          <header className="text-2xl">just1</header>
+          <header className="flex items-center justify-between">
+            <span className="text-2xl">just1</span>
+            <a href="https://x.com/TheArian81">
+              <div className="badge badge-outline">
+                coming soon, click for updates!
+              </div>
+            </a>
+            <span className="invisible text-2xl">just1</span>{" "}
+          </header>
 
           {/* Main Content */}
           <main className="text-center">
