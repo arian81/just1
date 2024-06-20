@@ -30,6 +30,25 @@ export default function Home() {
           href="/favicon-16x16.png"
         />
         <link rel="manifest" href="/site.webmanifest" />
+
+        <meta property="og:url" content="https://just1.place" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Just 1 place" />
+        <meta
+          property="og:description"
+          content="Let AI be your personal planner, picking just one cool spot from tons of reviews so you don't have to stress about where to go"
+        />
+        <meta property="og:image" content="https://just1.place/meta.png" />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="twitter:domain" content="just1.place" />
+        <meta property="twitter:url" content="https://just1.place" />
+        <meta name="twitter:title" content="Just 1 place" />
+        <meta
+          name="twitter:description"
+          content="Let AI be your personal planner, picking just one cool spot from tons of reviews so you don't have to stress about where to go"
+        />
+        <meta name="twitter:image" content="https://just1.place/meta.png" />
       </Head>
       <div className="relative h-screen overflow-hidden text-yellow-300">
         {/* Background */}
