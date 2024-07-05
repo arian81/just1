@@ -1,6 +1,7 @@
 import Head from "next/head";
 
 import React from "react";
+import { signIn } from "next-auth/react";
 
 export default function Home() {
   return (
@@ -79,6 +80,12 @@ export default function Home() {
               let ai be your personal planner, picking just one cool spot from
               tons of reviews so you don&apos;t have to stress about where to go
             </p>
+            <button
+              className="mt-8 rounded-lg bg-yellow-300 px-6 py-3 text-xl font-bold"
+              onClick={() => signIn("google")}
+            >
+              submit
+            </button>
           </main>
 
           {/* Footer */}
