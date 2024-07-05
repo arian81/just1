@@ -80,12 +80,12 @@ export default function Home() {
               let ai be your personal planner, picking just one cool spot from
               tons of reviews so you don&apos;t have to stress about where to go
             </p>
-            <button
+            {/* <button
               className="mt-8 rounded-lg bg-yellow-300 px-6 py-3 text-xl font-bold"
               onClick={() => signIn("google")}
             >
               submit
-            </button>
+            </button> */}
           </main>
 
           {/* Footer */}
