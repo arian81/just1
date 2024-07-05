@@ -1,10 +1,10 @@
 import Head from "next/head";
 
 import React from "react";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, useSession, signOut } from "next-auth/react";
 
 export default function Home() {
-  const sess = useSession();
+  const { data: session, status } = useSession();
 
   return (
     <>
@@ -70,7 +70,16 @@ export default function Home() {
                 coming soon, click for updates!
               </div>
             </a>
-            <span className="invisible text-2xl">just1</span>{" "}
+            {status === "authenticated" ? (
+              <button
+                onClick={() => signOut()}
+                className=" btn rounded-lg bg-yellow-300 text-black hover:bg-yellow-200"
+              >
+                Sign out
+              </button>
+            ) : (
+              <span className="invisible text-2xl">just1</span>
+            )}
           </header>
 
           {/* Main Content */}
@@ -82,13 +91,27 @@ export default function Home() {
               let ai be your personal planner, picking just one cool spot from
               tons of reviews so you don&apos;t have to stress about where to go
             </p>
-            <button
-              className="mt-8 rounded-lg bg-yellow-300 px-6 py-3 text-xl font-bold text-black"
-              onClick={() => signIn("google")}
-            >
-              submit
-            </button>
-            {sess.data?.user.name}
+            {status === "authenticated" ? (
+              <div className="flex items-center justify-center p-10">
+                <div className="rounded-md bg-yellow-300 p-4 text-black">
+                  <p className="w-fit text-lg font-bold ">
+                    thanks for signing up{" "}
+                    {session.user.name?.split(" ")[0]?.toLowerCase()}! i&apos;ll
+                    send you an email when i&apos;m done cooking.
+                  </p>
+                  <a href="https://youtu.be/BkjqUHlj6zA" className="underline">
+                    check out this quick demo in the meantime
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <button
+                className="mt-8 rounded-lg bg-yellow-300 px-6 py-3 text-xl font-bold text-black"
+                onClick={() => signIn("google")}
+              >
+                Sign up for access
+              </button>
+            )}
           </main>
 
           {/* Footer */}
