@@ -1,9 +1,11 @@
 import { z } from "zod";
 
 const ReviewSchema = z.object({
-  text: z.object({
-    text: z.string(),
-  }),
+  text: z
+    .object({
+      text: z.string().optional(),
+    })
+    .optional(),
 });
 
 const RegularOpeningHoursSchema = z.object({
@@ -75,8 +77,27 @@ const PlaceSchema = z.object({
   accessibilityOptions: AccessibilityOptionsSchema.optional(),
 });
 
+const PlaceSchemaLite = z.object({
+  id: z.string(),
+  types: z.array(z.string()),
+  rating: z.number(),
+  googleMapsUri: z.string(),
+  regularOpeningHours: RegularOpeningHoursSchema.optional(),
+  businessStatus: z.string(),
+  priceLevel: z.string().optional(),
+  displayName: z.object({
+    text: z.string(),
+  }),
+  editorialSummary: z
+    .object({
+      text: z.string(),
+    })
+    .optional(),
+  reviews: z.array(ReviewSchema).optional(),
+});
+
 const NearbyPlacesSchema = z.object({
-  places: z.array(PlaceSchema),
+  places: z.array(PlaceSchemaLite),
 });
 
 export default NearbyPlacesSchema;

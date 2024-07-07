@@ -5,6 +5,7 @@ import { type AppType } from "next/app";
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import { env } from "~/env";
+import { ThemeProvider } from "~/components/theme-provider";
 
 import { api } from "~/utils/api";
 
@@ -31,7 +32,14 @@ const MyApp: AppType<{ session: Session | null }> = ({
     <SessionProvider session={session}>
       <main className={GeistSans.className}>
         <PostHogProvider client={posthog}>
-          <Component {...pageProps} />
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Component {...pageProps} />
+          </ThemeProvider>
         </PostHogProvider>
       </main>
     </SessionProvider>
