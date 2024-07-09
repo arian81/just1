@@ -65,26 +65,26 @@ const TestPage: NextPage = () => {
   }, []);
 
   // Send user location to the server
-  useEffect(() => {
-    const saveLocation = async () => {
-      if (location) {
-        try {
-          const data = await mutateAsync({
-            latitude: location.latitude,
-            longitude: location.longitude,
-          });
-          console.log("sent data");
-          // setLongitude(data.longitude);
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    };
+  // useEffect(() => {
+  //   const saveLocation = async () => {
+  //     if (location) {
+  //       try {
+  //         const data = await mutateAsync({
+  //           latitude: location.latitude,
+  //           longitude: location.longitude,
+  //         });
+  //         console.log("sent data");
+  //         // setLongitude(data.longitude);
+  //       } catch (error) {
+  //         console.error(error);
+  //       }
+  //     }
+  //   };
 
-    saveLocation().catch((error) => {
-      console.error(error);
-    });
-  }, [location, mutateAsync]);
+  //   saveLocation().catch((error) => {
+  //     console.error(error);
+  //   });
+  // }, [location, mutateAsync]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
