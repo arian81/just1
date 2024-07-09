@@ -28,7 +28,7 @@ interface Location {
   longitude: number;
 }
 
-const Test: NextPage = () => {
+const Chat: NextPage = () => {
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
       streamMode: "text",
@@ -42,11 +42,11 @@ const Test: NextPage = () => {
       }),
     ),
   });
-  const [historyCopy, setHistoryCopy] = useState<string[]>([]);
-  useEffect(() => {
-    setHistoryCopy(messages.map((m) => m.content));
-  }, [messages]);
-  console.log("messages", historyCopy);
+  // const [historyCopy, setHistoryCopy] = useState<string[]>([]);
+  // useEffect(() => {
+  //   setHistoryCopy(messages.map((m) => m.content));
+  // }, [messages]);
+  // console.log("messages", historyCopy);
   return (
     <div className="flex h-full w-full flex-col items-center justify-center">
       <h1 className="text-4xl text-yellow-300">just1 place: hangout planner</h1>
@@ -139,4 +139,4 @@ const Test: NextPage = () => {
   );
 };
 
-export default Test;
+export default Chat;
