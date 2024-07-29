@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const placeDetailsSchema = z.object({
+export const placeDetailsSchema = z.object({
   googleMapsUri: z.string().url(),
   displayName: z.object({
     text: z.string(),
@@ -14,4 +14,6 @@ const placeDetailsSchema = z.object({
     .optional(),
 });
 
-export default placeDetailsSchema;
+export const placeTypes = z.object({
+  includedTypes: z.array(z.string()),
+});

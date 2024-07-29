@@ -56,45 +56,24 @@ export default function Home() {
       <div className="relative h-screen overflow-hidden text-yellow-300">
         {/* Background */}
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-center bg-cover"
           style={{ backgroundImage: "url('/bg.png')" }}
         />
 
         {/* Content */}
-        <div className="relative z-10 flex h-full flex-col justify-between p-6">
-          {/* Header */}
-          <header className="flex items-center justify-between">
-            <span className="text-2xl">just1</span>
-            <a href="https://x.com/TheArian81">
-              <div className="badge badge-outline">
-                coming soon, click for updates!
-              </div>
-            </a>
-            {status === "authenticated" ? (
-              <button
-                onClick={() => signOut()}
-                className=" btn rounded-lg bg-yellow-300 text-black hover:bg-yellow-200"
-              >
-                Sign out
-              </button>
-            ) : (
-              <span className="invisible text-2xl">just1</span>
-            )}
-          </header>
-
-          {/* Main Content */}
+        <div className="relative z-10 flex flex-col justify-between h-full p-6">
           <main className="text-center">
             <h1 className="mb-4 text-6xl font-bold">
               impromptu hangout planner
             </h1>
-            <p className="mx-auto max-w-2xl text-xl">
+            <p className="max-w-2xl mx-auto text-xl">
               let ai be your personal planner, picking just one cool spot from
               tons of reviews so you don&apos;t have to stress about where to go
             </p>
             {status === "authenticated" ? (
               <div className="flex items-center justify-center p-10">
-                <div className="rounded-md bg-yellow-300 p-4 text-black">
-                  <p className="w-fit text-lg font-bold ">
+                <div className="p-4 text-black bg-yellow-300 rounded-md">
+                  <p className="text-lg font-bold w-fit ">
                     thanks for signing up{" "}
                     {session.user.name?.split(" ")[0]?.toLowerCase()}! i&apos;ll
                     send you an email when i&apos;m done cooking.
@@ -106,7 +85,7 @@ export default function Home() {
               </div>
             ) : (
               <button
-                className="mt-8 rounded-lg bg-yellow-300 px-6 py-3 text-xl font-bold text-black"
+                className="px-6 py-3 mt-8 text-xl font-bold text-black bg-yellow-300 rounded-lg"
                 onClick={() => signIn("google")}
               >
                 Sign up for access

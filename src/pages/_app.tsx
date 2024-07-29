@@ -10,6 +10,7 @@ import { ThemeProvider } from "~/components/theme-provider";
 import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
+import Layout from "~/components/Layout";
 
 if (typeof window !== "undefined") {
   // checks that we are client-side
@@ -38,7 +39,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
             enableSystem
             disableTransitionOnChange
           >
-            <Component {...pageProps} />
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
           </ThemeProvider>
         </PostHogProvider>
       </main>

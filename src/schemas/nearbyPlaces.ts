@@ -96,8 +96,6 @@ const PlaceSchemaLite = z.object({
   reviews: z.array(ReviewSchema).optional(),
 });
 
-const NearbyPlacesSchema = z.object({
+export const NearbyPlacesSchema = z.object({
   places: z.array(PlaceSchemaLite),
 });
-
-export default NearbyPlacesSchema;

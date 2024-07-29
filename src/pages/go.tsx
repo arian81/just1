@@ -1,6 +1,6 @@
 import { type NextPage } from "next";
 import { useChat } from "ai/react";
-import { z } from "zod";
+import { set, z } from "zod";
 import Image from "next/image";
 import { Input } from "~/components/ui/input";
 import {
@@ -19,20 +19,22 @@ import {
   CarouselPrevious,
 } from "~/components/ui/carousel";
 import { Skeleton } from "~/components/ui/skeleton";
-
 import Link from "next/link";
-import { use, useEffect, useState } from "react";
-
-interface Location {
-  latitude: number;
-  longitude: number;
-}
+import { useEffect, useState } from "react";
+import type { Location } from "~/lib/types";
+import Modal from "~/components/Modal";
 
 const Chat: NextPage = () => {
+  const [location, setLocation] = useState<Location | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [locationLoading, setLocationLoading] = useState<boolean>(true);
+
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
       streamMode: "text",
+      body: { location: location },
     });
+
   const suggestionSchema = z.object({
     suggestions: z.array(
       z.object({
@@ -42,59 +44,81 @@ const Chat: NextPage = () => {
       }),
     ),
   });
-  // const [historyCopy, setHistoryCopy] = useState<string[]>([]);
-  // useEffect(() => {
-  //   setHistoryCopy(messages.map((m) => m.content));
-  // }, [messages]);
-  // console.log("messages", historyCopy);
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position: GeolocationPosition) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          setLocationLoading(false);
+        },
+        (error: GeolocationPositionError) => {
+          setError(error.message);
+          setLocationLoading(false);
+        },
+      );
+    } else {
+      setError("Geolocation is not supported by your browser");
+      setLocationLoading(false);
+    }
+  }, []);
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (location) {
+      handleSubmit(e);
+    } else if (error) {
+      alert(`Error: ${error}`);
+    } else {
+      alert("Please wait for location to load");
+    }
+  };
+
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center">
-      <h1 className="text-4xl text-yellow-300">just1 place: hangout planner</h1>
-      <div className=" mx-auto flex w-full max-w-md flex-col py-24">
+    <div className="flex min-h-screen w-full flex-col items-center justify-center p-4">
+      <div className="mx-auto flex w-full max-w-xl flex-col py-8">
+        <Modal loading={locationLoading} error={error} />
         {isLoading ? (
-          <Card className="w-full max-w-md bg-black text-white">
+          <Card className="w-full bg-black text-white">
             <CardHeader className="text-center">
               <CardTitle className="text-xl font-bold">
-                <Skeleton className="h-8 w-56" />
+                <Skeleton className="mx-auto h-8 w-56" />
               </CardTitle>
             </CardHeader>
             <CardContent className="flex justify-center">
-              <Skeleton className="h-[200px] w-full" />
+              <Skeleton className="h-48 w-full" />
             </CardContent>
             <CardFooter className="flex justify-center">
-              <Link
-                href={""}
-                className=" rounded-md bg-yellow-300 p-2 text-sm text-black"
-                target="_blank"
-              >
-                view location
-              </Link>
+              <Skeleton className="h-10 w-32" />
             </CardFooter>
           </Card>
         ) : (
           <>
-            <div className="flex flex-col gap-10">
+            <div className="flex flex-col gap-6">
               {messages.map((m) => (
                 <div key={m.id}>
                   {m.role === "user" ? (
-                    <p className="mb-4 rounded-md bg-yellow-300 p-5 text-black">
-                      here are my suggestions for: {m.content}
+                    <p className="mb-4 rounded-md bg-yellow-300 p-4 text-sm text-black md:text-base">
+                      Here are my suggestions for: {m.content}
                     </p>
                   ) : m.role === "assistant" ? (
-                    <Carousel>
+                    <Carousel className="w-full">
                       <CarouselContent>
                         {suggestionSchema
                           .parse(JSON.parse(m.content))
                           .suggestions.map((suggestion, idx) => (
-                            <CarouselItem key={idx} className="">
-                              <Card key={idx}>
+                            <CarouselItem key={idx}>
+                              <Card className="h-full">
                                 <CardHeader className="flex items-center">
-                                  <CardTitle>
+                                  <CardTitle className="text-lg md:text-xl">
                                     {suggestion.name.toLowerCase()}
                                   </CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                  <div className="relative  h-48 w-full">
+                                  <div className="relative h-36 w-full md:h-48">
                                     <Image
                                       src={suggestion.photo}
                                       alt={suggestion.name}
@@ -107,10 +131,10 @@ const Chat: NextPage = () => {
                                 <CardFooter className="flex justify-end">
                                   <Link
                                     href={suggestion.url}
-                                    className=" rounded-md bg-yellow-300 p-2 text-sm text-black"
+                                    className="rounded-md bg-yellow-300 p-2 text-xs text-black md:text-sm"
                                     target="_blank"
                                   >
-                                    view location
+                                    View location
                                   </Link>
                                 </CardFooter>
                               </Card>
@@ -126,14 +150,21 @@ const Chat: NextPage = () => {
             </div>
           </>
         )}
-        <form onSubmit={handleSubmit}>
-          <Input
-            className="mb-8 mt-10 w-full max-w-lg rounded p-2"
-            value={input}
-            placeholder="Say something like 'I want to grab some mexican food'"
-            onChange={handleInputChange}
-          />
-        </form>
+        {error ? (
+          <p className="text-red-500">
+            No location found. Please ensure you have enabled location services.
+            Try refreshing the page.
+          </p>
+        ) : (
+          <form onSubmit={handleFormSubmit} className="mt-6">
+            <Input
+              className="mb-4 w-full rounded p-2 text-sm md:text-base"
+              value={input}
+              placeholder="Say something like 'I want to grab some mexican food'"
+              onChange={handleInputChange}
+            />
+          </form>
+        )}
       </div>
     </div>
   );
