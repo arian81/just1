@@ -67,3 +67,7 @@ export default async function POST(
   }
   res.status(200).json({ suggestions: processedSuggestions });
 }
+
+export const config = {
+  maxDuration: 60,
+};
