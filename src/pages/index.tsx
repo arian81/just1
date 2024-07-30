@@ -1,10 +1,21 @@
 import Head from "next/head";
 
-import React from "react";
+import React, { use, useEffect } from "react";
 import { signIn, useSession, signOut } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router
+        .push("/go")
+        .catch((error) => console.error("Failed to redirect:", error));
+    }
+  }, [status, router]);
 
   return (
     <>
@@ -53,48 +64,33 @@ export default function Home() {
         />
         <meta name="twitter:image" content="https://just1.place/meta.png" />
       </Head>
-      <div className="relative h-screen overflow-hidden text-yellow-300">
+      <div className=" h-full pt-24 text-yellow-300">
         {/* Background */}
         <div
-          className="absolute inset-0 bg-center bg-cover"
+          className="absolute inset-0 -z-10 bg-cover bg-center"
           style={{ backgroundImage: "url('/bg.png')" }}
         />
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col justify-between h-full p-6">
+        <div className="h-full flex-col justify-between p-6">
           <main className="text-center">
             <h1 className="mb-4 text-6xl font-bold">
               impromptu hangout planner
             </h1>
-            <p className="max-w-2xl mx-auto text-xl">
+            <p className="mx-auto max-w-2xl text-xl">
               let ai be your personal planner, picking just one cool spot from
               tons of reviews so you don&apos;t have to stress about where to go
             </p>
-            {status === "authenticated" ? (
-              <div className="flex items-center justify-center p-10">
-                <div className="p-4 text-black bg-yellow-300 rounded-md">
-                  <p className="text-lg font-bold w-fit ">
-                    thanks for signing up{" "}
-                    {session.user.name?.split(" ")[0]?.toLowerCase()}! i&apos;ll
-                    send you an email when i&apos;m done cooking.
-                  </p>
-                  <a href="https://youtu.be/BkjqUHlj6zA" className="underline">
-                    check out this quick demo in the meantime
-                  </a>
-                </div>
-              </div>
-            ) : (
-              <button
-                className="px-6 py-3 mt-8 text-xl font-bold text-black bg-yellow-300 rounded-lg"
-                onClick={() => signIn("google")}
-              >
-                Sign up for access
-              </button>
-            )}
+            <button
+              className="mt-8 rounded-lg bg-yellow-300 px-6 py-3 text-xl font-bold text-black"
+              onClick={() => signIn("google")}
+            >
+              Sign in for access
+            </button>
           </main>
 
           {/* Footer */}
-          <footer className="flex items-end justify-between">
+          <footer className="absolute bottom-0 left-0 right-0 flex items-end justify-between p-4">
             <div className="">
               <svg
                 width="60"

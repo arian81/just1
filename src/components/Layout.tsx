@@ -8,9 +8,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { status } = useSession();
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="flex items-center justify-between bg-background/95 p-2 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <span className="text-2xl">just1</span>
+    <div className=" min-h-screen ">
+      <header className="background-red absolute top-0 z-10 flex w-full  items-center justify-between p-2">
+        <span className="text-2xl text-white">just1</span>
         <a href="https://x.com/TheArian81" className="hidden sm:block">
           <Badge
             variant="outline"
@@ -31,7 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           )}
         </div>
       </header>
-      <main className="flex-grow">{children}</main>
+      {children}
     </div>
   );
 }

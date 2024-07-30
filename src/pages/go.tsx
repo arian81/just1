@@ -1,4 +1,4 @@
-import { type NextPage } from "next";
+import { GetServerSidePropsContext, type NextPage } from "next";
 import { useChat } from "ai/react";
 import { set, z } from "zod";
 import Image from "next/image";
@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Location } from "~/lib/types";
 import Modal from "~/components/Modal";
+import { getServerAuthSession } from "~/server/auth";
 
 const Chat: NextPage = () => {
   const [location, setLocation] = useState<Location | null>(null);
@@ -168,6 +169,18 @@ const Chat: NextPage = () => {
       </div>
     </div>
   );
+};
+
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext,
+) => {
+  const session = await getServerAuthSession(context);
+
+  if (!session || !session.user) {
+    return { redirect: { destination: "/", permanent: false } };
+  }
+
+  return { props: {} };
 };
 
 export default Chat;
