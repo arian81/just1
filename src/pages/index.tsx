@@ -4,6 +4,7 @@ import React, { use, useEffect } from "react";
 import { signIn, useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Button, buttonVariants } from "~/components/ui/button";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -73,20 +74,29 @@ export default function Home() {
 
         {/* Content */}
         <div className="h-full flex-col justify-between p-6">
-          <main className="text-center">
-            <h1 className="mb-4 text-6xl font-bold">
+          <main className="flex flex-col items-center justify-center text-center">
+            <h1 className="mb-4 text-4xl font-bold md:text-6xl">
               impromptu hangout planner
             </h1>
             <p className="mx-auto max-w-2xl text-xl">
               let ai be your personal planner, picking just one cool spot from
               tons of reviews so you don&apos;t have to stress about where to go
             </p>
-            <button
-              className="mt-8 rounded-lg bg-yellow-300 px-6 py-3 text-xl font-bold text-black"
-              onClick={() => signIn("google")}
-            >
-              Sign in for access
-            </button>
+            <div className="flex gap-5 p-10">
+              <Button className="" onClick={() => signIn("google")}>
+                Sign in for access
+              </Button>
+              {/* <Button variant={"outline"}>buildspace demo</Button> */}
+              <Link
+                href={"/demo"}
+                className={
+                  buttonVariants({ variant: "ghost" }) +
+                  " border border-solid border-yellow-400 hover:border-none"
+                }
+              >
+                buildspace demo
+              </Link>
+            </div>
           </main>
 
           {/* Footer */}
