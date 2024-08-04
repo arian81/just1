@@ -35,7 +35,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <PostHogProvider client={posthog}>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
           >

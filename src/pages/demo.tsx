@@ -156,13 +156,19 @@ const Chat: NextPage = () => {
             Try refreshing the page.
           </p>
         ) : (
-          <form onSubmit={handleFormSubmit} className="mt-6">
+          <form onSubmit={handleFormSubmit} className="mt-6 flex gap-5">
             <Input
-              className="mb-4 w-full rounded p-2 text-sm md:text-base"
+              className="flex-grow rounded-l bg-black p-2 text-sm text-white dark:bg-white dark:text-black md:text-base"
               value={input}
-              placeholder="Say something like 'I want to grab some mexican food'"
+              placeholder="What do you want to do?"
               onChange={handleInputChange}
             />
+            <button
+              type="submit"
+              className="rounded bg-yellow-300 p-2 px-5 text-sm text-black md:text-base"
+            >
+              go
+            </button>
           </form>
         )}
       </div>

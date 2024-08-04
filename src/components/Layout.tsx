@@ -10,9 +10,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className=" min-h-screen ">
       <header className="background-red absolute top-0 z-10 flex w-full  items-center justify-between p-2">
-        <span className="text-2xl text-white">just1</span>
+        <span className="text-2xl text-black dark:text-white">just1</span>
         <a href="https://x.com/TheArian81" className="hidden sm:block">
-          <Badge variant="outline" className="text-yellow-300">
+          <Badge
+            variant="outline"
+            className="text-yellow-500 dark:text-yellow-300"
+          >
             work in progress, click for updates!
           </Badge>
         </a>
