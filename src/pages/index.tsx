@@ -83,19 +83,12 @@ export default function Home() {
               tons of reviews so you don&apos;t have to stress about where to go
             </p>
             <div className="flex gap-5 p-10">
-              <Button className="" onClick={() => signIn("google")}>
-                Sign in for access
-              </Button>
-              {/* <Button variant={"outline"}>buildspace demo</Button> */}
-              <Link
-                href={"/demo"}
-                className={
-                  buttonVariants({ variant: "ghost" }) +
-                  " border border-solid border-yellow-400 hover:border-none"
-                }
+              <Button
+                className=""
+                onClick={() => (window.location.href = "/go")}
               >
-                buildspace demo
-              </Link>
+                Try it out!
+              </Button>
             </div>
           </main>
 

@@ -24,17 +24,24 @@ import { useEffect, useState } from "react";
 import type { Location } from "~/lib/types";
 import Modal from "~/components/Modal";
 import { getServerAuthSession } from "~/server/auth";
+import { useSession } from "next-auth/react";
+import type { Session } from "next-auth";
 
-const Chat: NextPage = () => {
+type ChatProps = {
+  session?: Session | null;
+};
+
+const Chat: NextPage<ChatProps> = () => {
+  const { data: session } = useSession();
   const [location, setLocation] = useState<Location | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [locationLoading, setLocationLoading] = useState<boolean>(true);
+  const [showLoginPrompt, setShowLoginPrompt] = useState<boolean>(false);
 
   const { messages, input, handleInputChange, handleSubmit, status } = useChat({
     body: { location: location },
     streamProtocol: "text",
   });
-  console.log("DEBUGGGGGGGG", messages);
   const suggestionSchema = z.object({
     suggestions: z.array(
       z.object({
@@ -68,8 +75,18 @@ const Chat: NextPage = () => {
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!session) {
+      const queryCount = parseInt(sessionStorage.getItem("queryCount") ?? "0");
+      if (queryCount >= 3) {
+        setShowLoginPrompt(true);
+        return;
+      }
+      sessionStorage.setItem("queryCount", (queryCount + 1).toString());
+    }
+
     if (location) {
       handleSubmit(e);
+      setShowLoginPrompt(false);
     } else if (error) {
       alert(`Error: ${error}`);
     } else {
@@ -150,6 +167,15 @@ const Chat: NextPage = () => {
             </div>
           </>
         )}
+        {showLoginPrompt && (
+          <div className="mb-4 rounded-md border border-red-500 bg-red-100 p-4 text-center text-red-700">
+            You have reached the query limit. Please{" "}
+            <Link href="/api/auth/signin" className="font-bold underline">
+              log in
+            </Link>{" "}
+            to continue.
+          </div>
+        )}
         {error ? (
           <p className="text-red-500">
             No location found. Please ensure you have enabled location services.
@@ -162,10 +188,12 @@ const Chat: NextPage = () => {
               value={input}
               placeholder="What do you want to do?"
               onChange={handleInputChange}
+              disabled={showLoginPrompt}
             />
             <button
               type="submit"
-              className="rounded bg-yellow-300 p-2 px-5 text-sm text-black md:text-base"
+              className="rounded bg-yellow-300 p-2 px-5 text-sm text-black disabled:cursor-not-allowed disabled:opacity-50 md:text-base"
+              disabled={showLoginPrompt}
             >
               go
             </button>
@@ -176,15 +204,7 @@ const Chat: NextPage = () => {
   );
 };
 
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext,
-) => {
-  const session = await getServerAuthSession(context);
-
-  if (!session || !session.user) {
-    return { redirect: { destination: "/", permanent: false } };
-  }
-
+export const getServerSideProps = async () => {
   return { props: {} };
 };
 
