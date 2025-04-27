@@ -41,9 +41,16 @@ export const fetchNearbyPlaces = async (
     requestOptions,
   );
   if (!response.ok) {
-    throw new Error("Network response was not ok");
+    // Consider logging response.status and response.statusText here
+    throw new Error(`Network response was not ok: ${response.statusText}`);
   }
-  return NearbyPlacesSchema.parse(await response.json());
+  try {
+    return NearbyPlacesSchema.parse(await response.json());
+  } catch (e) {
+    console.error("Failed to parse NearbyPlacesSchema", e);
+    // Depending on requirements, you might want to throw or return an empty/error state
+    throw e;
+  }
 };
 
 export const fetchPlaceDetails = async (placeId: string) => {
@@ -64,13 +71,23 @@ export const fetchPlaceDetails = async (placeId: string) => {
     requestOptions,
   );
   if (!response.ok) {
-    throw new Error("Network response was not ok");
+    // Consider logging response.status and response.statusText here
+    throw new Error(`Network response was not ok: ${response.statusText}`);
   }
-  return placeDetailsSchema.parse(await response.json());
+  try {
+    return placeDetailsSchema.parse(await response.json());
+  } catch (e) {
+    console.error("Failed to parse placeDetailsSchema", e);
+    // Depending on requirements, you might want to throw or return an empty/error state
+    throw e;
+  }
 };
 
 export const fetchPlacePhotos = async (uri: string): Promise<string> => {
   if (uri === "") {
+    console.log(
+      "Empty URI provided for fetchPlacePhotos, returning empty string.",
+    );
     return "";
   }
 
@@ -78,44 +95,100 @@ export const fetchPlacePhotos = async (uri: string): Promise<string> => {
     method: "GET",
   };
 
-  const response = await fetch(
-    `https://places.googleapis.com/v1/${uri}/media?key=${env.GOOGLE_GENERATIVE_AI_API_KEY}&maxHeightPx=500&maxWidthPx=500`,
-    requestOptions,
-  );
+  let response: Response;
+  const photoUrl = `https://places.googleapis.com/v1/${uri}/media?key=${env.GOOGLE_GENERATIVE_AI_API_KEY}&maxHeightPx=500&maxWidthPx=500`;
 
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+  console.log("Attempting to fetch place photo from:", photoUrl);
+  try {
+    response = await fetch(photoUrl, requestOptions);
+    console.log("Fetch response status:", response.status, response.statusText);
+  } catch (error) {
+    console.error("Error during fetch call for place photo:", error);
+    // Rethrow or return empty string depending on how you want to handle fetch errors
+    // throw error; // Or return "" if you prefer graceful failure
+    return "";
   }
 
-  const buffer = Buffer.from(await response.arrayBuffer());
-  const contentType = response.headers.get("Content-Type") ?? "image/jpeg";
+  if (!response.ok) {
+    console.error(
+      `Failed to fetch place photo. Status: ${response.status} ${response.statusText}`,
+    );
+    // Optionally log response body if available and not too large
+    // const errorBody = await response.text();
+    // console.error("Error response body:", errorBody);
+    // Depending on requirements, throw or return empty string
+    // throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+    return ""; // Graceful failure
+  }
 
-  // Initialize Google Cloud Storage
-  const storage = new Storage({
-    projectId: env.GOOGLE_CLOUD_PROJECT_ID,
-    credentials: {
-      client_email: env.BUCKET_SA_EMAIL,
-      private_key: env.BUCKET_SA_PRIVATE_KEY,
-    },
-  });
+  let buffer: Buffer;
+  let contentType: string | null;
+  try {
+    console.log("Attempting to read response body as ArrayBuffer...");
+    const arrayBuffer = await response.arrayBuffer();
+    buffer = Buffer.from(arrayBuffer);
+    contentType = response.headers.get("Content-Type");
+    console.log(
+      `Successfully read buffer (${buffer.length} bytes), content type: ${contentType}`,
+    );
+    if (!contentType) {
+      console.warn(
+        "Content-Type header missing from response, defaulting to image/jpeg",
+      );
+      contentType = "image/jpeg";
+    }
+  } catch (error) {
+    console.error(
+      "Error processing response body (arrayBuffer/Buffer conversion):",
+      error,
+    );
+    return ""; // Or rethrow
+  }
 
-  const bucketName = "just1-place-images";
-  const bucket = storage.bucket(bucketName);
+  try {
+    console.log("Initializing Google Cloud Storage client...");
+    // Initialize Google Cloud Storage
+    const storage = new Storage({
+      projectId: env.GOOGLE_CLOUD_PROJECT_ID,
+      credentials: {
+        client_email: env.BUCKET_SA_EMAIL,
+        private_key: env.BUCKET_SA_PRIVATE_KEY?.replace(/\\n/g, "\n"), // Ensure newline characters are correctly interpreted if stored in env var
+      },
+    });
 
-  // Generate a unique filename
-  const filename = `${v7()}.${contentType.split("/")[1]}`;
+    const bucketName = "just1-place-images";
+    const bucket = storage.bucket(bucketName);
 
-  // Upload the image to Google Cloud Storage
-  const file = bucket.file(filename);
-  await file.save(buffer, {
-    metadata: {
-      contentType: contentType,
-    },
-  });
+    // Generate a unique filename
+    const extension = contentType.split("/")[1] ?? "jpg"; // Use extension from content type, default to jpg
+    const filename = `${v7()}.${extension}`;
 
-  // Make the file publicly accessible
-  await file.makePublic();
+    console.log(
+      `Attempting to upload to GCS: bucket=${bucketName}, filename=${filename}, contentType=${contentType}`,
+    );
+    // Upload the image to Google Cloud Storage
+    const file = bucket.file(filename);
+    await file.save(buffer, {
+      metadata: {
+        contentType: contentType,
+      },
+      public: true, // Make the file publicly accessible directly on upload
+      // predefinedAcl: 'publicRead' // Alternative way to make public
+    });
 
-  // Return the public URL of the uploaded image
-  return `https://storage.googleapis.com/${bucketName}/${filename}`;
+    // The file.makePublic() call might be redundant if public:true is set in save options,
+    // but it doesn't hurt to leave it as a fallback or explicit confirmation.
+    // console.log("Making file public...");
+    // await file.makePublic(); // Usually done automatically with public: true or predefinedAcl
+
+    const publicUrl = `https://storage.googleapis.com/${bucketName}/${filename}`;
+    console.log("Successfully uploaded image to GCS:", publicUrl);
+    // Return the public URL of the uploaded image
+    return publicUrl;
+  } catch (error) {
+    console.error("Error during Google Cloud Storage operation:", error);
+    // Rethrow or return empty string depending on requirements
+    // throw error;
+    return ""; // Graceful failure
+  }
 };

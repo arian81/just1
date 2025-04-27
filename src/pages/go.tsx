@@ -1,6 +1,6 @@
-import { GetServerSidePropsContext, type NextPage } from "next";
-import { useChat } from "ai/react";
-import { set, z } from "zod";
+import { type GetServerSidePropsContext, type NextPage } from "next";
+import { useChat } from "@ai-sdk/react";
+import { z } from "zod";
 import Image from "next/image";
 import { Input } from "~/components/ui/input";
 import {
@@ -30,12 +30,11 @@ const Chat: NextPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [locationLoading, setLocationLoading] = useState<boolean>(true);
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
-    useChat({
-      streamMode: "text",
-      body: { location: location },
-    });
-
+  const { messages, input, handleInputChange, handleSubmit, status } = useChat({
+    body: { location: location },
+    streamProtocol: "text",
+  });
+  console.log("DEBUGGGGGGGG", messages);
   const suggestionSchema = z.object({
     suggestions: z.array(
       z.object({
@@ -82,7 +81,7 @@ const Chat: NextPage = () => {
     <div className="flex min-h-screen w-full flex-col items-center justify-center p-4">
       <div className="mx-auto flex w-full max-w-xl flex-col py-8">
         <Modal loading={locationLoading} error={error} />
-        {isLoading ? (
+        {status === "submitted" || status === "streaming" ? (
           <Card className="w-full bg-black text-white">
             <CardHeader className="text-center">
               <CardTitle className="text-xl font-bold">

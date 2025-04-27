@@ -15,7 +15,8 @@
     "start": "next start"
   },
   "dependencies": {
-    "@ai-sdk/google": "^0.0.24",
+    "@ai-sdk/google": "^1.2.13",
+    "@ai-sdk/react": "^1.2.9",
     "@auth/prisma-adapter": "^1.6.0",
     "@google-cloud/storage": "^7.12.0",
     "@prisma/client": "^5.14.0",
@@ -28,7 +29,7 @@
     "@trpc/next": "next",
     "@trpc/react-query": "next",
     "@trpc/server": "next",
-    "ai": "^3.2.16",
+    "ai": "^4.3.10",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.1.6",
@@ -45,7 +46,7 @@
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^10.0.0",
-    "zod": "^3.23.8"
+    "zod": "^3.24.3"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.2",

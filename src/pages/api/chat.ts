@@ -21,6 +21,14 @@ export default async function POST(
   const current_query = messages
     .filter((m) => m.role === "user")
     .at(-1)?.content;
+
+  // Add check for empty query
+  if (!current_query || current_query.trim() === "") {
+    return res
+      .status(400)
+      .json({ error: "Query cannot be empty." } as unknown as Response);
+  }
+
   // filter out the last message which is the current query
   const previous_queries = messages
     .filter((m) => m.role === "user")
@@ -28,7 +36,7 @@ export default async function POST(
     .slice(0, -1);
 
   const generatedPlacesQuery = await generateText({
-    model: google("models/gemini-1.5-pro-latest"),
+    model: google("gemini-2.0-flash"),
     prompt:
       previous_queries.length > 0
         ? `Based on this query "${current_query}" choose all the applicable category types only from the following json file. In case the context of user's previous quries are needed here are the previous quries: ${previous_queries.join("\n")} \n\n categories: \n ${JSON.stringify(categories)}`
@@ -44,16 +52,23 @@ export default async function POST(
 
   const { places } = await fetchNearbyPlaces(query.includedTypes, location);
 
+  // Restore original prompt for place suggestions JSON
   const placePrompt = `Given the following descprtion of 20 locations, provide suggestion for only one location or multiple based on the user query which is ${current_query}. For example if the user is saying I want sushi then you should only provide one suggesstion, but if they say i want sushi and icecream then only two suggestions for each category. Provide the minimal amount of suggestions that satisfy the user's query. Your response should be a json with following schema: {"places":[{"id":"appropriate place id","name":"name of the place"}]} \n ${JSON.stringify(places)}`;
+
+  // Restore the generateText call for suggestions
   const placeSuggestions = await generateText({
-    model: google("models/gemini-1.5-pro-latest"),
+    model: google("gemini-2.0-flash"),
     prompt: placePrompt,
   });
+
+  // Restore parsing suggestions
   const suggestions = suggestionsSchema.parse(
     JSON.parse(
       placeSuggestions.text.replace(/^```json\n([\s\S]*)\n```$/m, "$1"),
     ),
   );
+
+  // Restore the processing loop
   const processedSuggestions: ResponseList = [];
   for (const suggestion of suggestions.places) {
     const details = await fetchPlaceDetails(suggestion.id);
@@ -65,9 +80,6 @@ export default async function POST(
       photo: photoUrl ?? "", //put placeholder image here
     });
   }
+
   res.status(200).json({ suggestions: processedSuggestions });
 }
-
-export const config = {
-  maxDuration: 60,
-};

@@ -80,7 +80,7 @@ const PlaceSchema = z.object({
 const PlaceSchemaLite = z.object({
   id: z.string(),
   types: z.array(z.string()),
-  rating: z.number(),
+  rating: z.number().nullish(),
   googleMapsUri: z.string(),
   regularOpeningHours: RegularOpeningHoursSchema.optional(),
   businessStatus: z.string(),
