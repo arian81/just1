@@ -4,6 +4,7 @@ import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
+import { Analytics } from "@vercel/analytics/react";
 import { env } from "~/env";
 import { ThemeProvider } from "~/components/theme-provider";
 
@@ -45,6 +46,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
             </Layout>
           </ThemeProvider>
         </PostHogProvider>
+        <Analytics />
       </main>
     </SessionProvider>
   );
