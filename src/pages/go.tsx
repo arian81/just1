@@ -212,7 +212,7 @@ const Chat: NextPage<ChatProps> = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <Card className="w-full overflow-hidden rounded-xl border-0 bg-gradient-to-b from-gray-800 to-black shadow-xl">
+              <Card className="w-full overflow-hidden rounded-xl border-0 bg-transparent shadow-xl">
                 <CardHeader className="text-center">
                   <CardTitle className="text-xl font-bold">
                     <Skeleton className="mx-auto h-8 w-56 bg-gray-700" />
