@@ -1,23 +1,10 @@
 import Head from "next/head";
 
-import React, { use, useEffect } from "react";
-import { signIn, useSession, signOut } from "next-auth/react";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { Button, buttonVariants } from "~/components/ui/button";
+import React from "react";
+
+import { Button } from "~/components/ui/button";
 
 export default function Home() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      router
-        .push("/go")
-        .catch((error) => console.error("Failed to redirect:", error));
-    }
-  }, [status, router]);
-
   return (
     <>
       <Head>
