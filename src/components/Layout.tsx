@@ -1,11 +1,14 @@
 import React from "react";
-import { signIn, useSession, signOut } from "next-auth/react";
-import { Badge } from "~/components/ui/badge";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { Button } from "./ui/button";
-import { ModeToggle } from "./ModeToggle";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
+
+  // Extract first name from full name
+  const firstName = session?.user?.name
+    ? session.user.name.split(" ")[0]
+    : null;
 
   return (
     <div className=" min-h-screen ">
@@ -13,13 +16,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <span className="text-2xl text-black dark:text-white">just1</span>
 
         <div className="flex items-center gap-2">
-          <ModeToggle />
-          {status === "authenticated" && (
+          {status === "authenticated" ? (
+            <>
+              <p className="text-sm font-medium text-white">
+                Hey, {firstName ?? "friend"}! ✨
+              </p>
+              <Button
+                onClick={() => signOut()}
+                className="btn rounded-lg bg-yellow-300 text-black hover:bg-yellow-200"
+              >
+                Sign out
+              </Button>
+            </>
+          ) : (
             <Button
-              onClick={() => signOut()}
+              onClick={() => signIn()}
               className="btn rounded-lg bg-yellow-300 text-black hover:bg-yellow-200"
             >
-              Sign out
+              Sign in
             </Button>
           )}
         </div>

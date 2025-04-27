@@ -36,7 +36,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
-            enableSystem
+            enableSystem={false}
+            forcedTheme="dark"
             disableTransitionOnChange
           >
             <Layout>
